@@ -1,0 +1,47 @@
+<span style="margin-left: 0px"><span style="color:#943126;">import</span> os</span></br>
+<span style="margin-left: 0px"></span></br>
+<span style="margin-left: 0px"><span style="color:#943126;">from</span> email.mime.multipart <span style="color:#943126;">import</span> MIMEMultipart</span></br>
+<span style="margin-left: 0px"><span style="color:#943126;">from</span> email.mime.text <span style="color:#943126;">import</span> MIMEText</span></br>
+<span style="margin-left: 0px"><span style="color:#943126;">from</span> email.mime.base <span style="color:#943126;">import</span> MIMEBase</span></br>
+<span style="margin-left: 0px"><span style="color:#943126;">from</span> mimetypes <span style="color:#943126;">import</span> guess_type</span></br>
+<span style="margin-left: 0px"><span style="color:#943126;">from</span> email.encoders <span style="color:#943126;">import</span> encode_base64</span></br>
+<span style="margin-left: 0px"></span></br>
+<span style="margin-left: 0px"></span></br>
+<span style="margin-left: 0px"><span style="color:#943126;">def</span> get_alias(filename):</span></br>
+<span style="margin-left: 20px">    <span style="color:#943126;">try</span>:</span></br>
+<span style="margin-left: 40px">        f = <span style="color:#af601a;">tuple</span>(filename.rsplit(<span style="color:#1e8449;">':'</span>, <span style="color:#21618c;">1</span>))</span></br>
+<span style="margin-left: 40px">        <span style="color:#943126;">return</span> (f[<span style="color:#21618c;">0</span>], f[<span style="color:#21618c;">1</span>] <span style="color:#943126;">if</span> len(f) > <span style="color:#21618c;">1</span> <span style="color:#943126;">else</span> os.path.basename(f[<span style="color:#21618c;">0</span>]))</span></br>
+<span style="margin-left: 20px">    <span style="color:#943126;">except</span> Exception:</span></br>
+<span style="margin-left: 40px">        <span style="color:#943126;">return</span> (filename.filename, filename.filename)</span></br>
+<span style="margin-left: 0px"></span></br>
+<span style="margin-left: 0px"></span></br>
+<span style="margin-left: 0px"><span style="color:#943126;">class</span> Email:</span></br>
+<span style="margin-left: 20px">    <span style="color:#943126;">def</span> __init__(self, fromaddr, toaddr, subject, message, message_type=<span style="color:#1e8449;">'plain'</span>,</span></br>
+<span style="margin-left: 85px">                 attachments=<span style="color:#633974;">None</span>, cc=<span style="color:#633974;">None</span>,message_encoding=<span style="color:#1e8449;">'utf-<span style="color:#21618c;">8</span>'</span>):</span></br>
+<span style="margin-left: 40px">        self.email = MIMEMultipart()</span></br>
+<span style="margin-left: 40px">        self.email[<span style="color:#1e8449;">'From'</span>] = fromaddr</span></br>
+<span style="margin-left: 40px">        self.email[<span style="color:#1e8449;">'To'</span>] = toaddr</span></br>
+<span style="margin-left: 40px">        self.email[<span style="color:#1e8449;">'Subject'</span>] = subject</span></br>
+<span style="margin-left: 40px">        <span style="color:#943126;">if</span> cc <span style="color:#af601a;">is</span> <span style="color:#af601a;">not</span> <span style="color:#633974;">None</span>:</span></br>
+<span style="margin-left: 60px">            self.email[<span style="color:#1e8449;">'cc'</span>] = cc</span></br>
+<span style="margin-left: 40px">        text = MIMEText(message, message_type, message_encoding)</span></br>
+<span style="margin-left: 40px">        self.email.attach(text)</span></br>
+<span style="margin-left: 40px">        <span style="color:#943126;">if</span> attachments <span style="color:#af601a;">is</span> <span style="color:#af601a;">not</span> <span style="color:#633974;">None</span>:</span></br>
+<span style="margin-left: 60px">            <span style="color:#943126;">for</span> filename <span style="color:#af601a;">in</span> attachments:</span></br>
+<span style="margin-left: 80px">                filename, alias = get_alias(filename)</span></br>
+<span style="margin-left: 80px">                mimetype, encoding = guess_type(filename)</span></br>
+<span style="margin-left: 80px">                mimetype = mimetype.split(<span style="color:#1e8449;">'/'</span>, <span style="color:#21618c;">1</span>)</span></br>
+<span style="margin-left: 80px">                <span style="color:#943126;">with</span> open(filename, <span style="color:#1e8449;">'rb'</span>) <span style="color:#943126;">as</span> _file:</span></br>
+<span style="margin-left: 100px">                    attachment = MIMEBase(mimetype[<span style="color:#21618c;">0</span>], mimetype[<span style="color:#21618c;">1</span>])</span></br>
+<span style="margin-left: 100px">                    attachment.set_payload(_file.read())</span></br>
+<span style="margin-left: 100px">                    encode_base64(attachment)</span></br>
+<span style="margin-left: 100px">                    attachment.add_header(<span style="color:#1e8449;">'Content-Disposition', 'attachment'</span>,</span></br>
+<span style="margin-left: 210px">                                          filename=alias)</span></br>
+<span style="margin-left: 100px">                    self.email.attach(attachment)</span></br>
+<span style="margin-left: 0px"></span></br>
+<span style="margin-left: 20px">    <span style="color:#943126;">def</span> set_toaddr(self, toaddr):</span></br>
+<span style="margin-left: 40px">        self.email[<span style="color:#1e8449;">'To'</span>] = toaddr</span></br>
+<span style="margin-left: 0px"></span></br>
+<span style="margin-left: 20px">    <span style="color:#943126;">def</span> __repr__(self):</span></br>
+<span style="margin-left: 40px">        <span style="color:#943126;">return</span> self.email.as_string()</span></br>
+<span style="margin-left: 0px"></span></br>
