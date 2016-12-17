@@ -1,29 +1,15 @@
 import abc
 import re
+import sys
+import json
 
-
-PURPLE = '#ad64ff'
-ORANGE = '#e79951'
-RED = '#ff3b24'
-GREEN = '#64ff75'
-BLUE = ' #51a9e7'
-GRAY = '#606468'
-BLACK = '#323231'
-WHITE = '#ead09a'
+from collections import namedtuple
 
 
 class TranslatorBase:
 
     @abc.abstractmethod
     def translate(self, code):
-        return
-
-    @abc.abstractmethod
-    def init_words(self):
-        return
-
-    @abc.abstractmethod
-    def init_colors4reserved_words(self):
         return
 
     @abc.abstractmethod
@@ -37,6 +23,22 @@ class TranslatorBase:
     @abc.abstractmethod
     def is_reserved_correct(self, match, code):
         return True
+
+    def init_translator(self, description):
+        with open(description, 'r') as _file:
+            try:
+                descr = json.loads(_file.read())
+                self.parse_descr(descr)
+            except Exception:
+                print('[-] Error occured')
+                sys.exit()
+
+    def parse_descr(self, descr):
+        for color, words in descr['reserved']:
+            for word in words:
+                self.reserved_words[word] = color
+        for name, color in descr['basic_colors'].items():
+            self.basic_colors[name] = color
 
     def translate(self, code):
         code = self.escaping(code)
@@ -56,19 +58,20 @@ class TranslatorBase:
     def get_prefix_html(self):
         global BLACK
         return ('<!DOCTYPE html><html><head><style> body '
-                '{background-color: %s;}</style></head><body>') % BLACK
+                '{background-color: %s;}</style></head><body>') % \
+                self.basic_colors['background']
 
     def get_suffix_html(self):
         return '</body></html>'
 
     def save_html(self, html):
-        global WHITE
+        color = self.basic_colors['text']
         filename = self.filename.rsplit('.', maxsplit=1)[0] + '.html'
         with open(filename, 'w') as _file:
             for line in html.split('\n'):
                 indent = len(line) - len(line.lstrip(' '))
                 _file.write(('<code style="margin-left: {}px; color: {};">{}'
-                             '</code></br>\n').format(indent * 5, WHITE, line))
+                             '</code></br>\n').format(indent * 5, color, line))
 
     def replace_obj(self, bounds, code):
         html = ''
@@ -106,10 +109,10 @@ class TranslatorBase:
         return bounds
 
     def get_strings(self, code):
-        global GREEN
-        return self.get_bounds(GREEN, r'\'.*?\'', code) +\
-               self.get_bounds(GREEN, r'\".*?\"', code)
+        color = self.basic_colors['strings']
+        return self.get_bounds(color, r'\'.*?\'', code) +\
+               self.get_bounds(color, r'\".*?\"', code)
 
     def get_digits(self, code):
-        global BLUE
-        return self.get_bounds(BLUE, r'\d+', code)
+        color = self.basic_colors['digits']
+        return self.get_bounds(color, r'\d+', code)

@@ -16,13 +16,13 @@ def get_code(filname):
     with open(filname, 'r') as _file:
         return _file.read()
 
-def get_translator(filname, lang):
+def get_translator(filname, ext):
     global translators
 
     try:
-        if lang is None:
-            lang = filname.rsplit('.', maxsplit=1)[-1]
-        return translators[lang]
+        if ext is None:
+            ext = filname.rsplit('.', maxsplit=1)[-1]
+        return translators[ext]
     except KeyError:
         print("[-] Error occurred")
         sys.exit()
@@ -34,13 +34,21 @@ def main():
                         help='Extension of programming language')
     parser.add_argument('--file', action='store', type=str,
                         help='File with source code')
+    parser.add_argument('--descr', action='store', type=str,
+                        help=('Description of source code (See structure'
+                              ' in readme)'))
     args = parser.parse_args()
 
     filename = args.file
+    descr = args.descr
     ext = args.ext
 
-    translator = get_translator(filename, ext)
-    translator(filename).translate(get_code(filename))
+    if descr is None or filename is None:
+        print('[-] Error occured')
+        sys.exit()
+
+    Translator = get_translator(filename, ext)
+    Translator(filename, descr).translate(get_code(filename))
 
 
 if __name__ == '__main__':

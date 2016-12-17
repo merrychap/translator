@@ -1,0 +1,18 @@
+{
+    "basic_colors": {
+        "digits": "#51a9e7",
+        "comments": "#606468",
+        "background": "#323231",
+        "strings": "#64ff75",
+        "text": "#ead09a"
+    },
+    "reserved": [
+        ["#ad64ff", ["False", "True", "None"]],
+        ["#e79951", ["and", "in", "is", "not", "or", "tuple", "list", "str",
+                     "open"]],
+        ["#ff3b24", ["as", "assert", "break", "class", "continue", "def",
+                     "del", "elif", "else", "except", "finally", "for",
+                     "from", "global", "if", "import", "nonlocal", "pass",
+                     "raise", "return", "try", "while", "with", "yield"]]
+    ]
+}

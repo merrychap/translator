@@ -1,17 +1,17 @@
 import re
 
-from ..base_translator import TranslatorBase, BLUE, ORANGE, PURPLE, RED, GRAY
+from ..base_translator import TranslatorBase
 
 
 reserved_words = {}
 
 
 class PythonTranslator(TranslatorBase):
-    def __init__(self, filename):
+    def __init__(self, filename, descr):
         self.filename = filename
         self.reserved_words = {}
-        self.init_words()
-        self.init_colors4reserved_words()
+        self.basic_colors = {}
+        self.init_translator(descr)
 
     def init_words(self):
         self.bool_w = ['False', 'True', 'None']
@@ -22,13 +22,5 @@ class PythonTranslator(TranslatorBase):
                         'from', 'global', 'if', 'import', 'nonlocal', 'pass',
                         'raise', 'return', 'try', 'while', 'with', 'yield']
 
-    def init_colors4reserved_words(self):
-        global PURPLE, ORANGE, RED
-        for words_class, color in [(self.bool_w, PURPLE), (self.logic_w, ORANGE),
-                                (self.other_w, RED)]:
-            for word in words_class:
-                self.reserved_words[word] = color
-
     def get_comments(self, code):
-        global GRAY
-        return self.get_bounds(GRAY, r'#.*?', code)
+        return self.get_bounds(self.basic_colors['comments'], r'#.*?', code)
