@@ -1,34 +1,18 @@
 import sys
 import argparse
 
-
+from translators.trans_distr import TransDistributor
 from translators.python.python_trans import PythonTranslator
 from translators.cpp.cpp_translator import CPPTranslator
-
-
-translators = {
-    'py': PythonTranslator,
-    'cpp': CPPTranslator
-}
 
 
 def get_code(filname):
     with open(filname, 'r') as _file:
         return _file.read()
 
-def get_translator(filname, ext):
-    global translators
-
-    try:
-        if ext is None:
-            ext = filname.rsplit('.', maxsplit=1)[-1]
-        return translators[ext]
-    except KeyError:
-        print("[-] Error occurred")
-        sys.exit()
-
-
 def main():
+    distr = TransDistributor()
+
     parser = argparse.ArgumentParser()
     parser.add_argument('--ext', action='store', type=str,
                         help='Extension of programming language')
@@ -47,7 +31,9 @@ def main():
         print('[-] Error occured')
         sys.exit()
 
-    Translator = get_translator(filename, ext)
+    Translator = distr.get_translator(filename, ext)
+    if Translator is None:
+        sys.exit()
     Translator(filename, descr).translate(get_code(filename))
 
 

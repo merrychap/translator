@@ -7,7 +7,7 @@
         "text": "#ead09a"
     },
     "reserved": [
-        ["#ad64ff", ["false", "true", "cin", "cout"]],
+        ["#ad64ff", ["false", "true"]],
         ["#e79951", ["and_eq", "and", "bitand", "bitor", "compl", "map",
                      "dynamic_cast", "not", "not_eq", "nullptr", "import",
                      "module", "or", "or_eq", "private", "include","public",
@@ -26,6 +26,6 @@
                      "static_cast", "struct", "switch", "template", "this",
                      "thread_local", "throw", "typedef", "typename",
                      "union", "unsigned", "using", "virtual", "void",
-                     "volatile", "while", "string"]]
+                     "volatile", "while", "string", "cin", "cout"]]
     ]
 }

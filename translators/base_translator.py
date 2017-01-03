@@ -79,20 +79,27 @@ class TranslatorBase:
         _st = 0
         while index < len(bounds):
             st, en, txt, clr = (bounds[index][i] for i in range(4))
-
             index += 1
-            while index < len(bounds) and en > bounds[index][0]:
+            while index < len(bounds) and (en > bounds[index][0] and
+                                           st != bounds[index][0]):
                 index += 1
             if index >= len(bounds):
                 break
+            elif st == bounds[index][0]:
+                continue
             local_end = bounds[index][0]
-            html += code[_st:st] + self.get_span(txt, clr) + code[en:local_end]
+            html += code[_st:st] + self.get_span(txt, clr) + \
+                    code[en:local_end]
             _st = local_end
         html += code[_st:st] + self.get_span(txt, clr) + code[en:]
         return html
 
     def get_span(self, text, color):
-        return '<span style="color:{}">{}</span>'.format(color, text)
+        if text[-1] == '\n':
+            return '<span style="color:{}">{}</span>\n'.format(color,
+                                                               text[:-1])
+        else:
+            return '<span style="color:{}">{}</span>'.format(color, text)
 
     def get_bounds(self, color, pattern, s):
         bounds = []
@@ -110,8 +117,8 @@ class TranslatorBase:
 
     def get_strings(self, code):
         color = self.basic_colors['strings']
-        return self.get_bounds(color, r'\'.*?\'', code) +\
-               self.get_bounds(color, r'\".*?\"', code)
+        return self.get_bounds(color, r"'.*?'", code) +\
+               self.get_bounds(color, r'".*?"', code)
 
     def get_digits(self, code):
         color = self.basic_colors['digits']

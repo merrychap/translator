@@ -23,4 +23,4 @@ class PythonTranslator(TranslatorBase):
                         'raise', 'return', 'try', 'while', 'with', 'yield']
 
     def get_comments(self, code):
-        return self.get_bounds(self.basic_colors['comments'], r'#.*?', code)
+        return self.get_bounds(self.basic_colors['comments'], r'#.*', code)
